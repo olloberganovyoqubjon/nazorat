@@ -1,0 +1,77 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2023.0.3")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '6.1.12'
+
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
+//    implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '3.3.3'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+    // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+
+// https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.0'
+// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.3.0'
+    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.2.2'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.1'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml-full', version: '5.2.1'
+    implementation 'com.google.code.gson:gson:2.9.0'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('jar') {
+    enabled = true // .jar yaratishni yoqish
+}
+bootJar {
+    enabled = true // Spring Boot uchun bajariluvchi .jar faylni yoqish
+}

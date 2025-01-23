@@ -1,0 +1,9 @@
+{
+  "isIgnore": true,
+  "NotIgnoreUser": {
+    "id": [11]
+  },
+  "IgnoreUser": {
+    "id": [12,11]
+  }
+}
