@@ -115,8 +115,37 @@ public class StatisticsService {
 
     public ApiResult getTableControls(Users currentUser) {
         List<StatisticsTable> statisticsTableList = new ArrayList<>();
-        controlRepository.
+        List<Users> usersList = userRepository.findByStage(currentUser.getStage() - 1);
+        int allControls = 0;
+        int allReturnedAndNotReturnedControls = 0;
+        int nowControls = 0;
+        int returnedControls = 0;
+        int notControls = 0;
+        for (Users users : usersList) {
+            List<Integer> integerListControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndBControl(users.getId(), true);
+            nowControls = integerListControl.size();
+            List<Integer> integerListReturnedControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(users.getId(),true);
+            returnedControls = integerListReturnedControl.size();
+            List<Integer> integerListNoteControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(users.getId(),false);
+            notControls = integerListNoteControl.size();
+        }
+        allReturnedAndNotReturnedControls = nowControls + returnedControls;
+        allControls = notControls + allReturnedAndNotReturnedControls;
+        statisticsTableList.add(new StatisticsTable("Rahbarning nazoratlari", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
-        return null;
+
+        List<Integer> integerListControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndBControl(currentUser.getId(), true);
+        List<Integer> integerListReturnedControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(currentUser.getId(),true);
+        List<Integer> integerListNoteControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(currentUser.getId(),false);
+        int allReturnedAndNotReturnedControlsMein = integerListControlMein.size() + integerListReturnedControlMein.size();
+        int allControlsMein = integerListNoteControlMein.size() + allReturnedAndNotReturnedControlsMein;
+        statisticsTableList.add(new StatisticsTable("Mening nazoratlarim", allControlsMein, allReturnedAndNotReturnedControlsMein, integerListControlMein.size(), integerListReturnedControlMein.size(), integerListNoteControlMein.size()));
+
+
+
+
+
+
+        return new ApiResult("Barcha nazoratlar statistikasi", true, statisticsTableList);
     }
 }

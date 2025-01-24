@@ -8,8 +8,8 @@ import lombok.Data;
 public class StatisticsTable {
     private String name;
     private Integer allCountControls;
-    private Integer nowCountControls;
-    private Integer returnedCountControls;
-    private Integer notReturnedCountControls;
-    private Integer notCountControls;
+    private Integer allReturnedAndNotReturnedControls;
+    private Integer nowControls;
+    private Integer returnedControls;
+    private Integer notControls;
 }

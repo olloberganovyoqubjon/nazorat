@@ -264,5 +264,12 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
     Integer countDocsByCreatedDateAndResPersonId(@Param("createdDate") Date createdDate, @Param("resPersonId") Long resPersonId);
 
 
-    List<Integer> countControlByUsers_Id(@Param("userId") Long userId);
+    List<Integer> countControlByUsers_IdAndBControlNotNullAndBControl(Long users_id, Boolean BControl);
+    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(Long users_id, Boolean BControl);
+    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(Long users_id, Boolean BControl);
+
+//    List<Integer> countControlByUsers_IdAndBControlNotNullAndBControl(Long users_id, Boolean BControl);
+//    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(Long users_id, Boolean BControl);
+//    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(Long users_id, Boolean BControl);
+
 }
