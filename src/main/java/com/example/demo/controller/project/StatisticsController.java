@@ -102,4 +102,15 @@ public class StatisticsController {
         ApiResult apiResult = statisticsService.getTableControls(currentUser);
         return ResponseEntity.ok(apiResult);
     }
+
+
+    @PreAuthorize(value = "hasAuthority('GET_CONTROL')") //permission (huquq bo'yicha tekshirish)
+    @RoleniTekshirish(role = "RAIS, HELPER, USER")
+    @GetMapping("allManagementControls")
+    public HttpEntity<?> getAllManagementControls(@CurrentUser Users currentUser) {
+        ApiResult apiResult = statisticsService.getAllManagementControls(currentUser);
+        return ResponseEntity.ok(apiResult);
+    }
+
+
 }

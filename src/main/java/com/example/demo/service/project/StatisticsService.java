@@ -1,12 +1,13 @@
 package com.example.demo.service.project;
 
 import com.example.demo.entity.Users;
+import com.example.demo.entity.project.Control;
 import com.example.demo.helper.WeekDaysCalculator;
 import com.example.demo.payload.ApiResult;
+import com.example.demo.payload.project.ManagementStatisticsDto;
 import com.example.demo.payload.project.StatisticsDto;
 import com.example.demo.payload.project.StatisticsTable;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.repository.project.ChargersRepository;
 import com.example.demo.repository.project.ControlRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,10 @@ public class StatisticsService {
     private final ControlRepository controlRepository;
     private final UserRepository userRepository;
 
-    public StatisticsService(ControlRepository controlRepository, ChargersRepository chargersRepository, UserRepository userRepository) {
+    public StatisticsService(ControlRepository controlRepository, UserRepository userRepository) {
         this.controlRepository = controlRepository;
         this.userRepository = userRepository;
     }
-
 
     public ApiResult getControls(Users user) {
         List<StatisticsDto> statisticsDtoList = new ArrayList<>();
@@ -85,6 +85,7 @@ public class StatisticsService {
         calendar.add(Calendar.DAY_OF_MONTH, +count);
         return calendar.getTime();
     }
+
     public ApiResult getChiefControls(Users currentUser) {
         Date subtractedDate1 = plusDate(1);
         int count1 = controlRepository.countByChiefControlAndUsers_IdLate(currentUser.getId(),true,subtractedDate1);
@@ -110,6 +111,7 @@ public class StatisticsService {
             statisticsDtoList.add(new StatisticsDto(count1, count2, count3, "O'tgan hafta va bugungi kungacha bo'lgan nazoratlar statistikasi", week, currentDate,null));
         });
         statisticsDtoList.sort(Comparator.comparing(StatisticsDto::getDate));
+        System.out.println(statisticsDtoList);
         return new ApiResult("O'tgan hafta va bugungi kungacha bo'lgan nazoratlar statistikasi", true, statisticsDtoList);
     }
 
@@ -129,7 +131,7 @@ public class StatisticsService {
         returnedControls = controlRepository.countControlByUsers_IdAndBControlIsNotNullAndControlAndBControl(currentUser.getId(), false);
         notControls = controlRepository.countControlByUsers_IdAndBControlIsNull(currentUser.getId());
 
-        statisticsTableList.add(new StatisticsTable("Barcha nazoratlar", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
+        statisticsTableList.add(new StatisticsTable("Mening nazoratlarim", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
         //rahbar nazoratlari
         allControls = controlRepository.countAllChiefControlByChargerUserId(currentUser.getId());
@@ -141,14 +143,48 @@ public class StatisticsService {
         statisticsTableList.add(new StatisticsTable("Rahbar nazoratlari", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
         //qo'l ostidagi nazoratlar
-        allControls = controlRepository.countAllChildControlByResPersonId(currentUser.getId());
-        allReturnedAndNotReturnedControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNotNul(currentUser.getId());
-        nowControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), true);
-        returnedControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), false);
-        notControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNull(currentUser.getId());
+        allControls = controlRepository.countAllChildControlByResPersonId(currentUser.getId(), currentUser.getStage() + 1);
+        allReturnedAndNotReturnedControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNotNul(currentUser.getId(), currentUser.getStage() + 1);
+        nowControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), true, currentUser.getStage() + 1);
+        returnedControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), false, currentUser.getStage() + 1);
+        notControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNull(currentUser.getId(), currentUser.getStage() + 1);
 
         statisticsTableList.add(new StatisticsTable("Qo'l ostidagi nazoratlar", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
         return new ApiResult("Barcha nazoratlar statistikasi", true, statisticsTableList);
     }
+
+    public ApiResult getAllManagementControls(Users currentUser) {
+        List<ManagementStatisticsDto> managementStatisticsDtoList = new ArrayList<>();
+        userRepository.findByStage(currentUser.getStage() + 1).forEach(users -> {
+            int notControlled = 0;
+            int returnedControl = 0;
+            int threeDaysMore = 0;
+            int twoDaysLess = 0;
+            int late = 0;
+            List<Control> controlList = controlRepository.findByUsers_Id(users.getId());
+            for (Control control : controlList) {
+                if (control.getReturned()) {
+                    returnedControl++;
+                } else {
+                    if (control.getControlPeriod() != null) {
+                        if (control.getControlPeriod().before(new Date())) {
+                            late++;
+                        } else {
+                            if (control.getControlPeriod().after(plusDate(2))) {
+                                threeDaysMore++;
+                            } else {
+                                twoDaysLess++;
+                            }
+                        }
+                    } else {
+                        notControlled++;
+                    }
+                }
+            }
+            managementStatisticsDtoList.add(new ManagementStatisticsDto(users.getManagement(), notControlled, returnedControl, threeDaysMore, twoDaysLess, late));
+        });
+        return new ApiResult("Barcha rahbarlar, o'z va qo'l ostidagilarning nazoratlari statistikasi", true, managementStatisticsDtoList);
+    }
+
 }

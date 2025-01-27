@@ -21,7 +21,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
 
     List<Control> findByReturnedAndSeen(Boolean returned, Boolean seen);
 
-    Set<Control> findByUsers_Id(Long id);
+    List<Control> findByUsers_Id(Long id);
 
     Set<Control> findByResPersonOrUsersOrderById(Users resPerson, Users users);
 
@@ -279,7 +279,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @return soni qaytadi
      */
     @Query("select count(d) from Control d " +
-            "where d.bControl is not null and d.users.id = :userId")
+            "where d.controlPeriod is not null and d.users.id = :userId")
     Integer countControlByUsers_IdAndBControlIsNotNull(@Param("userId") Long userId);
 
 
@@ -290,7 +290,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @return soni qaytadi
      */
     @Query("select count(d) from Control d " +
-            "where d.bControl is not null and d.users.id = :userId and d.bControl = :bControl")
+            "where d.controlPeriod is not null and d.users.id = :userId and d.bControl = :bControl")
     Integer countControlByUsers_IdAndBControlIsNotNullAndControlAndBControl(@Param("userId") Long userId, @Param("bControl") Boolean bControl);
 
 
@@ -302,7 +302,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @return soni qaytadi
      */
     @Query("select count(d) from Control d " +
-            "where d.bControl is null and d.users.id = :userId")
+            "where d.controlPeriod is null and d.users.id = :userId")
     Integer countControlByUsers_IdAndBControlIsNull(@Param("userId") Long userId);
 
 
@@ -327,7 +327,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
     @Query("select count(d) " +
             "from Control d " +
             "join Charger c on d.id = c.control.id " +
-            "where d.bControl is not null " +
+            "where d.controlPeriod is not null " +
             "  and c.users.id = :userId")
     Integer countAllReturnedAndNotReturnedChiefControlByUserId(@Param("userId") Long userId);
 
@@ -364,8 +364,8 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @param resPersonId resolyutsiya foydalanuvchi id raqami
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId")
-    Integer countAllChildControlByResPersonId(@Param("resPersonId") Long resPersonId);
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.users.stage = :stage")
+    Integer countAllChildControlByResPersonId(@Param("resPersonId") Long resPersonId, @Param("stage") Integer stage);
 
 
     /**
@@ -373,8 +373,8 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @param resPersonId resolyutsiya foydalanuvchi id raqami
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is not null")
-    Integer countAllChildControlByResPersonIdAndBControlIsNotNul(@Param("resPersonId") Long resPersonId);
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.controlPeriod is not null and d.users.stage = :stage")
+    Integer countAllChildControlByResPersonIdAndBControlIsNotNul(@Param("resPersonId") Long resPersonId, @Param("stage") Integer stage);
 
 
 
@@ -384,14 +384,14 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @param bControl nazoratga qo'yilgan yoki qo'yilmagan hujjatlar
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl = :bControl")
-    Integer countAllChildControlByResPersonIdAndBControl(@Param("resPersonId") Long resPersonId, @Param("bControl") Boolean bControl);
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl = :bControl and d.users.stage = :stage")
+    Integer countAllChildControlByResPersonIdAndBControl(@Param("resPersonId") Long resPersonId, @Param("bControl") Boolean bControl, @Param("stage") Integer stage);
 
     /**
      * Barcha o'zidan pastgi rahbarlar o'zini resolyutsiyaga qo'yilmagan nazoratlar soni
      * @param resPersonId resolyutsiya foydalanuvchi id raqami
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is null")
-    Integer countAllChildControlByResPersonIdAndBControlIsNull(@Param("resPersonId") Long resPersonId);
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is null and d.users.stage = :stage")
+    Integer countAllChildControlByResPersonIdAndBControlIsNull(@Param("resPersonId") Long resPersonId, @Param("stage") Integer stage);
 }

@@ -17,7 +17,7 @@ public class WeekDaysCalculator {
 
         // O'tgan haftalardagi kunlar
 
-            LocalDate startOfWeek = startOfCurrentWeek.minusWeeks(1);
+            LocalDate startOfWeek = startOfCurrentWeek.minusDays(6);
             for (int j = 0; j < 7; j++) {
                 LocalDate day = startOfWeek.plusDays(j);
                 Date utilDate = Date.from(day.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -25,12 +25,12 @@ public class WeekDaysCalculator {
             }
 
 
-        // Joriy haftaning kunlari
-        for (int i = 0; i < currentDate.getDayOfWeek().getValue(); i++) {
-            LocalDate day = startOfCurrentWeek.plusDays(i);
-            Date utilDate = Date.from(day.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            days.put(utilDate,formatDayWithWeekday(day));
-        }
+//        // Joriy haftaning kunlari
+//        for (int i = 0; i < currentDate.getDayOfWeek().getValue(); i++) {
+//            LocalDate day = startOfCurrentWeek.plusDays(i);
+//            Date utilDate = Date.from(day.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//            days.put(utilDate,formatDayWithWeekday(day));
+//        }
 
         return days;
     }
