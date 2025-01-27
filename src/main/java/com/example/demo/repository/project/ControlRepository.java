@@ -264,12 +264,134 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
     Integer countDocsByCreatedDateAndResPersonId(@Param("createdDate") Date createdDate, @Param("resPersonId") Long resPersonId);
 
 
-    List<Integer> countControlByUsers_IdAndBControlNotNullAndBControl(Long users_id, Boolean BControl);
-    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(Long users_id, Boolean BControl);
-    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(Long users_id, Boolean BControl);
+    /**
+     * Barcha nazoratlar soni
+     * @param userId foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d where d.users.id = :userId")
+    Integer countAllControlByUsers_Id(@Param("userId") Long userId);
 
-//    List<Integer> countControlByUsers_IdAndBControlNotNullAndBControl(Long users_id, Boolean BControl);
-//    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(Long users_id, Boolean BControl);
-//    List<Integer> countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(Long users_id, Boolean BControl);
 
+    /**
+     * Barcha nazoratga qo'yilgan va qo'yilmagan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d " +
+            "where d.bControl is not null and d.users.id = :userId")
+    Integer countControlByUsers_IdAndBControlIsNotNull(@Param("userId") Long userId);
+
+
+    /**
+     * Barcha nazoratga qo'yilgan va qo'yilmagan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @param bControl nazoratga qo'yilgan va qo'yilmagan hujjatlar
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d " +
+            "where d.bControl is not null and d.users.id = :userId and d.bControl = :bControl")
+    Integer countControlByUsers_IdAndBControlIsNotNullAndControlAndBControl(@Param("userId") Long userId, @Param("bControl") Boolean bControl);
+
+
+
+
+    /**
+     * Barcha nazoratga qo'yilmagan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d " +
+            "where d.bControl is null and d.users.id = :userId")
+    Integer countControlByUsers_IdAndBControlIsNull(@Param("userId") Long userId);
+
+
+    /**
+     * Barcha nazoratga qo'yilgan va qo'yilmagan hujjatlar soni
+     * @param chargerUserId nazoratga qo'yilgan foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) " +
+            "from Control d " +
+            "join Charger c on d.id = c.control.id " +
+            "where c.users.id = :chargerUserId")
+    Integer countAllChiefControlByChargerUserId(@Param("chargerUserId") Long chargerUserId);
+
+
+
+    /**
+     * Barcha rahbar tomonidan nazoratga qo'yilgan va qo'yilmagan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) " +
+            "from Control d " +
+            "join Charger c on d.id = c.control.id " +
+            "where d.bControl is not null " +
+            "  and c.users.id = :userId")
+    Integer countAllReturnedAndNotReturnedChiefControlByUserId(@Param("userId") Long userId);
+
+
+    /**
+     * Barcha rahbar tomonidan nazoratdan yewchilmagan yoki yechilgan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @param bControl nazoratga qo'yilgan yoki qo'yilmagan hujjatlar
+     * @return soni qaytadi
+     */
+    @Query("select count(d) " +
+            "from Control d " +
+            "join Charger c on d.id = c.control.id " +
+            "where d.bControl = :bControl " +
+            "  and c.users.id = :userId")
+    Integer countAllReturnedOrNotReturnedChiefControlByUserIdAndBControl(@Param("userId") Long userId, @Param("bControl") Boolean bControl);
+
+
+    /**
+     * Barcha rahbar tomonidan nazoratga qo'yilmagan hujjatlar soni
+     * @param userId foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) " +
+            "from Control d " +
+            "join Charger c on d.id = c.control.id " +
+            "where d.bControl is null " +
+            "  and c.users.id = :userId")
+    Integer countAllNotChiefControlByUserIdAndBControl(@Param("userId") Long userId);
+
+
+    /**
+     * Barcha o'zidan pastgi rahbarlar o'zini resolyutsiyaga qo'ygan nazoratlar soni
+     * @param resPersonId resolyutsiya foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId")
+    Integer countAllChildControlByResPersonId(@Param("resPersonId") Long resPersonId);
+
+
+    /**
+     * Barcha o'zidan pastgi rahbarlar o'zini resolyutsiyaga qo'ygan va qo'yilmagan nazoratlar soni
+     * @param resPersonId resolyutsiya foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is not null")
+    Integer countAllChildControlByResPersonIdAndBControlIsNotNul(@Param("resPersonId") Long resPersonId);
+
+
+
+    /**
+     * Barcha o'zidan pastgi rahbarlar o'zini resolyutsiyaga qo'ygan va qo'yilmagan nazoratlar soni
+     * @param resPersonId resolyutsiya foydalanuvchi id raqami
+     * @param bControl nazoratga qo'yilgan yoki qo'yilmagan hujjatlar
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl = :bControl")
+    Integer countAllChildControlByResPersonIdAndBControl(@Param("resPersonId") Long resPersonId, @Param("bControl") Boolean bControl);
+
+    /**
+     * Barcha o'zidan pastgi rahbarlar o'zini resolyutsiyaga qo'yilmagan nazoratlar soni
+     * @param resPersonId resolyutsiya foydalanuvchi id raqami
+     * @return soni qaytadi
+     */
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is null")
+    Integer countAllChildControlByResPersonIdAndBControlIsNull(@Param("resPersonId") Long resPersonId);
 }

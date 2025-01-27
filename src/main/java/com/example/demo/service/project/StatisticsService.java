@@ -115,36 +115,39 @@ public class StatisticsService {
 
     public ApiResult getTableControls(Users currentUser) {
         List<StatisticsTable> statisticsTableList = new ArrayList<>();
-        List<Users> usersList = userRepository.findByStage(currentUser.getStage() - 1);
-        int allControls = 0;
-        int allReturnedAndNotReturnedControls = 0;
-        int nowControls = 0;
-        int returnedControls = 0;
-        int notControls = 0;
-        for (Users users : usersList) {
-            List<Integer> integerListControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndBControl(users.getId(), true);
-            nowControls = integerListControl.size();
-            List<Integer> integerListReturnedControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(users.getId(),true);
-            returnedControls = integerListReturnedControl.size();
-            List<Integer> integerListNoteControl = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(users.getId(),false);
-            notControls = integerListNoteControl.size();
-        }
-        allReturnedAndNotReturnedControls = nowControls + returnedControls;
-        allControls = notControls + allReturnedAndNotReturnedControls;
-        statisticsTableList.add(new StatisticsTable("Rahbarning nazoratlari", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
+        int allControls;                        //barcha nazoratlar
+        int allReturnedAndNotReturnedControls;  //barcha qaytarilgan va qaytarilmagan nazoratlar
+        int nowControls;                        //hali nazoratda
+        int returnedControls;                   //qaytarilgan
+        int notControls;                        //barcha nazoratdan qo'yilmaganlart
 
 
-        List<Integer> integerListControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndBControl(currentUser.getId(), true);
-        List<Integer> integerListReturnedControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNotNullAndBControl(currentUser.getId(),true);
-        List<Integer> integerListNoteControlMein = controlRepository.countControlByUsers_IdAndBControlNotNullAndControlPeriodIsNullAndBControl(currentUser.getId(),false);
-        int allReturnedAndNotReturnedControlsMein = integerListControlMein.size() + integerListReturnedControlMein.size();
-        int allControlsMein = integerListNoteControlMein.size() + allReturnedAndNotReturnedControlsMein;
-        statisticsTableList.add(new StatisticsTable("Mening nazoratlarim", allControlsMein, allReturnedAndNotReturnedControlsMein, integerListControlMein.size(), integerListReturnedControlMein.size(), integerListNoteControlMein.size()));
+        //mening nazoratlarim
+        allControls = controlRepository.countAllControlByUsers_Id(currentUser.getId());
+        allReturnedAndNotReturnedControls = controlRepository.countControlByUsers_IdAndBControlIsNotNull(currentUser.getId());
+        nowControls = controlRepository.countControlByUsers_IdAndBControlIsNotNullAndControlAndBControl(currentUser.getId(), true);
+        returnedControls = controlRepository.countControlByUsers_IdAndBControlIsNotNullAndControlAndBControl(currentUser.getId(), false);
+        notControls = controlRepository.countControlByUsers_IdAndBControlIsNull(currentUser.getId());
 
+        statisticsTableList.add(new StatisticsTable("Barcha nazoratlar", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
+        //rahbar nazoratlari
+        allControls = controlRepository.countAllChiefControlByChargerUserId(currentUser.getId());
+        allReturnedAndNotReturnedControls = controlRepository.countAllReturnedAndNotReturnedChiefControlByUserId(currentUser.getId());
+        nowControls = controlRepository.countAllReturnedOrNotReturnedChiefControlByUserIdAndBControl(currentUser.getId(), true);
+        returnedControls = controlRepository.countAllReturnedOrNotReturnedChiefControlByUserIdAndBControl(currentUser.getId(), false);
+        notControls = controlRepository.countAllNotChiefControlByUserIdAndBControl(currentUser.getId());
 
+        statisticsTableList.add(new StatisticsTable("Rahbar nazoratlari", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
+        //qo'l ostidagi nazoratlar
+        allControls = controlRepository.countAllChildControlByResPersonId(currentUser.getId());
+        allReturnedAndNotReturnedControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNotNul(currentUser.getId());
+        nowControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), true);
+        returnedControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), false);
+        notControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNull(currentUser.getId());
 
+        statisticsTableList.add(new StatisticsTable("Qo'l ostidagi nazoratlar", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
 
         return new ApiResult("Barcha nazoratlar statistikasi", true, statisticsTableList);
     }
