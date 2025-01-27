@@ -125,6 +125,12 @@ public class ControlService {
     }
 
 
+    /**
+     * nazoratga config.json faylidan olingan qiymatlarni qo'shish
+     * @param savedControl nazorat
+     * @param chargers     nazoratga qo'yilganlar
+     * @return xatolik yuz berib qolgan bo'lsa uni qaytaradi, aks holda null qaytaradi
+     */
     private String add16(Control savedControl, List<Charger> chargers) {
         if (savedControl.getResPerson().getStage() == 1) {
             Boolean isIgnore = ConfigReader.readConfigFileToBoolean("isIgnore");
@@ -353,7 +359,8 @@ public class ControlService {
      * hujjatni nazoratdan yechish metodi
      *
      * @param currentUser   kirgan foydalanuvchi
-     * @param outControlDto
+     * @param outControlDto nazoratdan yechish qiymatlari
+     * return muvaffaqiyatli saqlanganligi haqida belgi va success
      */
     public ApiResult deleteControl(Users currentUser, OutControlDto outControlDto) {
         Role role = currentUser.getRole();

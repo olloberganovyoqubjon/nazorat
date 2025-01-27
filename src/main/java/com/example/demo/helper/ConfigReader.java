@@ -26,9 +26,9 @@ public class ConfigReader {
         try {
             FileReader reader = new FileReader("config.json");
             JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
-            JsonObject notIgnoreUser = jsonObject.getAsJsonObject(name);
+            boolean asBoolean = jsonObject.get(name).getAsBoolean();
             reader.close();
-            return new Gson().fromJson(notIgnoreUser.getAsJsonObject(), Boolean.class);
+            return asBoolean;
         } catch (IOException e) {
             return null;
         }
