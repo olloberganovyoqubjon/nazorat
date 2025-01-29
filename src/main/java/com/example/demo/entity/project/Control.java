@@ -63,4 +63,5 @@ public class Control {
     private Date createdDate;
     private Date modifiedDate;
 
+    private String returnReason;            //qaytarish sababi
 }

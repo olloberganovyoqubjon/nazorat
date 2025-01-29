@@ -378,7 +378,7 @@ public class ControlService {
         }
         control.setOutControllerId(currentUser.getId());
         control.setBControl(false);
-        control.setReasonOutControl(outControlDto.getReasonOutControl());
+        control.setReasonOutControl(outControlDto.getReturnReason());
         controlRepository.save(control);
         return new ApiResult("Ushbu hujjat nazoratdan yechildi", true);
     }
@@ -1128,7 +1128,7 @@ public class ControlService {
                     , controlDto.getResDate(), controlDto.getResolution(), controlDto.getControllerPerson(), controlDto.getTel()
                     , control.getReceptionDate(), control.getExecutionRegNum(), control.getExecutionDate(), control.getExecutorTel()
                     , control.getWorkDone(), currentUser, control.getReturned(), control.getSeen(), control.getWorkbookNum()
-                    , control.getWorkbookPageNum(), control.getReasonOutControl(), control.getCreatedDate(), new Date(System.currentTimeMillis()));
+                    , control.getWorkbookPageNum(), control.getReasonOutControl(), control.getCreatedDate(), new Date(System.currentTimeMillis()),null);
 
             controlRepository.save(control);
             String error = add16(control, chargerList);
@@ -1149,5 +1149,29 @@ public class ControlService {
         return new ApiResult("Qaytarilayotgan nazorat qiymatlari!", true
                 , new ReturnControlDto(control.getReceptionDate(), control.getExecutionRegNum(), control.getExecutionDate()
                 , control.getExecutorTel(), control.getWorkbookNum(), control.getWorkbookPageNum(), control.getWorkDone()));
+    }
+
+    public ApiResult updateReturn(Users currentUser, OutControlDto outControlDto) {
+        Optional<Control> optionalControl = controlRepository.findById(outControlDto.getIdControl());
+        if (optionalControl.isEmpty()) {
+            return new ApiResult("Bunday nazorat mavjud emas!", false);
+        }
+        Control control = optionalControl.get();
+        if (!control.getUsers().getId().equals(currentUser.getId())) {
+            return new ApiResult("Bunday nazoratni o'zgartirish huquqi sizda mavjud emas!", false);
+        }
+        control.setReturned(false);
+        control.setSeen(false);
+        control.setReceptionDate(null);
+        control.setExecutionRegNum(null);
+        control.setExecutionDate(null);
+        control.setExecutorTel(null);
+        control.setWorkDone(null);
+        control.setWorkbookNum(null);
+        control.setWorkbookPageNum(null);
+        control.setReasonOutControl(null);
+        control.setReturnReason(outControlDto.getReturnReason());
+        controlRepository.save(control);
+        return new ApiResult("Nazorat muvaffaqiyatli qaytarildi!", true);
     }
 }

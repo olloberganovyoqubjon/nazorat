@@ -135,6 +135,25 @@ public class ControlController {
 
 
 
+
+
+    /**
+     * nazoratdan qaytarilgan hujjatni qabul qilish
+     *
+     * @param currentUser kirgan foydalanuvchi
+     * @return muvaffaqiyatli saqlanganligi haqida belgi va success
+     */
+    @RoleniTekshirish(role = "USER, HELPER, RAIS")
+    @PostMapping("returnToUser/{controlId}")
+    public HttpEntity<?> updateReturn(@RequestBody OutControlDto outControlDto, @CurrentUser Users currentUser) {
+        ApiResult apiResult = controlService.updateReturn(currentUser, outControlDto);
+        return ResponseEntity.status(apiResult.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResult);
+    }
+
+
+
+
+
     /**
      * Hujjatni qaytarib olishni bekor qilish
      *
@@ -249,6 +268,11 @@ public class ControlController {
     }
 
 
+    /**
+     * pdf yoriqnoma yaratish
+     * @param response fayl uzatish
+     * @return fayl ko'rinishida qaytadi
+     */
     @GetMapping("help")
     public HttpEntity<?> help(HttpServletResponse response) {
         ApiResult apiResult = controlService.helpPdf(response);
@@ -257,6 +281,11 @@ public class ControlController {
 
 
 
+    /**
+     * video yoriqnoma yaratish
+     * @param response fayl uzatish
+     * @return fayl ko'rinishida qaytadi
+     */
     @GetMapping("helpVideo")
     public HttpEntity<?> helpVideo(HttpServletResponse response) {
         ApiResult apiResult = controlService.helpVideo(response);
