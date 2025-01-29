@@ -27,6 +27,8 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
 
     Set<Control> findByResPersonOrderById(Users resPerson);
 
+    List<Control> findByResPerson_IdAndUsers_StageAndUsers_Id(Long resPerson_id, Integer users_stage, Long users_id);
+
     List<Control> findByUsersOrderByIdDesc(Users users);
 
     List<Control> findByResPersonAndUsersIsNotOrderByIdDesc(Users resPerson, Users users);
@@ -384,7 +386,7 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @param bControl nazoratga qo'yilgan yoki qo'yilmagan hujjatlar
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl = :bControl and d.users.stage = :stage")
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl = :bControl and d.users.stage = :stage and d.controlPeriod is not null")
     Integer countAllChildControlByResPersonIdAndBControl(@Param("resPersonId") Long resPersonId, @Param("bControl") Boolean bControl, @Param("stage") Integer stage);
 
     /**
@@ -392,6 +394,6 @@ public interface ControlRepository extends JpaRepository<Control, Long> {
      * @param resPersonId resolyutsiya foydalanuvchi id raqami
      * @return soni qaytadi
      */
-    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.bControl is null and d.users.stage = :stage")
+    @Query("select count(d) from Control d where d.resPerson.id = :resPersonId and d.controlPeriod is null and d.users.stage = :stage")
     Integer countAllChildControlByResPersonIdAndBControlIsNull(@Param("resPersonId") Long resPersonId, @Param("stage") Integer stage);
 }

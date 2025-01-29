@@ -121,7 +121,7 @@ public class StatisticsService {
         int allReturnedAndNotReturnedControls;  //barcha qaytarilgan va qaytarilmagan nazoratlar
         int nowControls;                        //hali nazoratda
         int returnedControls;                   //qaytarilgan
-        int notControls;                        //barcha nazoratdan qo'yilmaganlart
+        int notControls;                        //barcha nazoratdan qo'yilmaganlar
 
 
         //mening nazoratlarim
@@ -145,8 +145,8 @@ public class StatisticsService {
         //qo'l ostidagi nazoratlar
         allControls = controlRepository.countAllChildControlByResPersonId(currentUser.getId(), currentUser.getStage() + 1);
         allReturnedAndNotReturnedControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNotNul(currentUser.getId(), currentUser.getStage() + 1);
-        nowControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), true, currentUser.getStage() + 1);
         returnedControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), false, currentUser.getStage() + 1);
+        nowControls = controlRepository.countAllChildControlByResPersonIdAndBControl(currentUser.getId(), true, currentUser.getStage() + 1);
         notControls = controlRepository.countAllChildControlByResPersonIdAndBControlIsNull(currentUser.getId(), currentUser.getStage() + 1);
 
         statisticsTableList.add(new StatisticsTable("Qo'l ostidagi nazoratlar", allControls, allReturnedAndNotReturnedControls, nowControls, returnedControls, notControls));
@@ -162,8 +162,8 @@ public class StatisticsService {
             int threeDaysMore = 0;
             int twoDaysLess = 0;
             int late = 0;
-            List<Control> controlList = controlRepository.findByUsers_Id(users.getId());
-            for (Control control : controlList) {
+            List<Control> controlSet = controlRepository.findByResPerson_IdAndUsers_StageAndUsers_Id(currentUser.getId(), users.getStage(), users.getId());
+            for (Control control : controlSet) {
                 if (control.getReturned()) {
                     returnedControl++;
                 } else {
@@ -171,7 +171,7 @@ public class StatisticsService {
                         if (control.getControlPeriod().before(new Date())) {
                             late++;
                         } else {
-                            if (control.getControlPeriod().after(plusDate(2))) {
+                            if (control.getControlPeriod().after(plusDate(3))) {
                                 threeDaysMore++;
                             } else {
                                 twoDaysLess++;
