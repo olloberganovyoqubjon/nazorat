@@ -144,7 +144,7 @@ public class ControlController {
      * @return muvaffaqiyatli saqlanganligi haqida belgi va success
      */
     @RoleniTekshirish(role = "USER, HELPER, RAIS")
-    @PostMapping("returnToUser/{controlId}")
+    @PostMapping("returnToUser")
     public HttpEntity<?> updateReturn(@RequestBody OutControlDto outControlDto, @CurrentUser Users currentUser) {
         ApiResult apiResult = controlService.updateReturn(currentUser, outControlDto);
         return ResponseEntity.status(apiResult.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResult);
